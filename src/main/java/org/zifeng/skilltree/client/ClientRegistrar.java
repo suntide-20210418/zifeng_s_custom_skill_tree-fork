@@ -40,6 +40,14 @@ public class ClientRegistrar {
         NeoForge.EVENT_BUS.register(org.zifeng.skilltree.client.StickToolHudRenderer.class);
         // 容器绑定瞄准提示（2026-09-08：BIND 模式下准星指向可绑容器时黄绿选框）
         NeoForge.EVENT_BUS.register(BindTargetRenderer.class);
+        // DimensionTech 联动（寻宝大师扩展：宝箱信息浮层 + 手持宝箱标记器左键标记）
+        NeoForge.EVENT_BUS.register(org.zifeng.skilltree.client.TreasureInfoOverlay.class);
+        NeoForge.EVENT_BUS.register(org.zifeng.skilltree.client.ChestMarkInputHandler.class);
+        // DimensionTech 联动（结构剖析：区域框渲染 + 周期扫描请求）
+        NeoForge.EVENT_BUS.register(org.zifeng.skilltree.client.StructureRegionRenderer.class);
+        // DimensionTech 联动（结构剖析面板 + 宝箱信息浮层：GUI 层注册）
+        modEventBus.addListener(org.zifeng.skilltree.client.StructureAnalysisHudRenderer::registerGuiLayers);
+        modEventBus.addListener(org.zifeng.skilltree.client.TreasureInfoOverlay::registerGuiLayers);
         // 断开连接清空客户端缓存（2026-08-25 多人防跨服数据残留：HUD 技能点/凤凰涅槃冷却/技能缓存）
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) -> {
             org.zifeng.skilltree.client.SkillPointHudRenderer.onDisconnect();
@@ -48,6 +56,10 @@ public class ClientRegistrar {
             org.zifeng.skilltree.client.MagnetExclusionClientState.onDisconnect(); // 磁铁屏蔽区缓存重置（防跨服残留）
             org.zifeng.skilltree.client.ZoneExclusionClientState.onDisconnect(); // 机械共鸣选区第一角重置（防跨服残留）
             org.zifeng.skilltree.client.ClientGlobalState.reset(); // 2026-08-28：全局状态缓存重置（防跨服残留）
+            // DimensionTech 联动缓存重置（防跨服残留）
+            org.zifeng.skilltree.client.SkillLinkClientState.onDisconnect();
+            org.zifeng.skilltree.client.TreasureInfoOverlay.onDisconnect();
+            org.zifeng.skilltree.client.ChestMarkInputHandler.onDisconnect();
         });
     }
 }

@@ -100,6 +100,10 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 dependencies {
     // Jade API（compileOnly：仅编译用；运行时若未安装 Jade 不会加载插件类，绝不崩溃）
     compileOnly "maven.modrinth:jade:15.10.6+neoforge"
+    // DimensionTech（可选联动的数据来源：结构/宝箱战利品期望、结构价值、维度价值）。
+    // compileOnly → 只借它的 API 签名编译；运行时若未安装，compat 隔离层不会被触达（见 DimensionTechBridge 门闩）。
+    // 本地开发前置：先在 DimensionTech 工程执行 ./gradlew publishToMavenLocal（坐标见 dimension_tech_version）。
+    compileOnly "com.suntide_20210418.dimensiontech:DimensionTech-1.21.1:${dimension_tech_version}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

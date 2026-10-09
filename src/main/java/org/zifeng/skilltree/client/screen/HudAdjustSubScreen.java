@@ -8,14 +8,17 @@ import net.minecraft.client.gui.screens.Screen;
  * <p>悬浮在玩家屏幕中间的不透明面板，用于调整技能点 HUD 的显示与位置。
  * <p>行1：HUD 开关；行2：X 位置（左/右箭头 + 滚轮）；行3：Y 位置；
  * 行4：真实血量数字开关；行5：伤害吸收数字开关（2026-09-11）；
- * 行6：护甲数字开关；行7：满值数字开关（三数字共用，默认关）；行8：重置归零。
+ * 行6：护甲数字开关；行7：满值数字开关（三数字共用，默认关）；
+ * 行8：结构剖析面板开关；行9/10：结构剖析面板 X/Y；行11：期望列表条数；行12：宝箱信息浮层开关；
+ * 行13：重置位置（同时归零技能点 HUD 与结构剖析面板）。
+ * <p>行8~12 为 DimensionTech 联动新增（未装 DimensionTech 时仍可调，只是面板数值区显示占位）。
  * <p>步进与技能点切换一致：普通=1，Shift=10，Ctrl=100。
  */
 public class HudAdjustSubScreen extends SkillSubScreen {
     /** 面板宽 */
     private static final int PANEL_W = 220;
     /** 面板高 */
-    private static final int PANEL_H = 218; // 2026-09-11：4 行 → 8 行（+4×22）
+    private static final int PANEL_H = 330; // 2026-10-09：8 行 → 13 行（+5 行 DimensionTech 联动设置）
     /** 行高 */
     private static final int ROW_H = 18;
     /** 行起始 y（标题栏下方） */
@@ -47,7 +50,7 @@ public class HudAdjustSubScreen extends SkillSubScreen {
         renderRows(gui, mouseX, mouseY);
     }
 
-    /** 渲染 8 行控制：开关 / X / Y / 血量数字 / 吸收数字 / 护甲数字 / 满值数字 / 重置 */
+    /** 渲染 13 行控制 */
     private void renderRows(GuiGraphics gui, int mouseX, int mouseY) {
         var overlay = net.minecraft.client.renderer.RenderType.guiOverlay();
         // 行1：开关
@@ -94,8 +97,33 @@ public class HudAdjustSubScreen extends SkillSubScreen {
                 showMax ? 0xFF2A4A2A : 0xFF4A2A2A,
                 showMax ? 0xFF55FF55 : 0xFFFF5555,
                 mouseX, mouseY);
-        // 行8：重置按钮（红色系）
-        drawRow(gui, 7, t("hud_reset"), 0xFFFF5555, 0xFF3A2A2A, 0xFFDD5555, mouseX, mouseY);
+        // 行8：结构剖析面板开关（DimensionTech 联动）
+        boolean structHud = org.zifeng.skilltree.client.SkillKeyBinds.isAnalysisHudVisible();
+        drawRow(gui, 7,
+                t("hud_structure_hud") + ": " + (structHud ? t("hud_state_on") : t("hud_state_off")),
+                structHud ? 0xFF55FF55 : 0xFFFF5555,
+                structHud ? 0xFF2A4A2A : 0xFF4A2A2A,
+                structHud ? 0xFF55FF55 : 0xFFFF5555,
+                mouseX, mouseY);
+        // 行9：结构剖析面板 X 位置
+        drawPosRow(gui, 8, t("hud_structure_x"),
+                org.zifeng.skilltree.client.SkillKeyBinds.getAnalysisHudOffsetX(), mouseX, mouseY);
+        // 行10：结构剖析面板 Y 位置
+        drawPosRow(gui, 9, t("hud_structure_y"),
+                org.zifeng.skilltree.client.SkillKeyBinds.getAnalysisHudOffsetY(), mouseX, mouseY);
+        // 行11：期望物品列表显示条数
+        drawPosRow(gui, 10, t("hud_item_limit"),
+                org.zifeng.skilltree.client.SkillKeyBinds.getAnalysisHudItemLimit(), mouseX, mouseY);
+        // 行12：宝箱信息浮层开关
+        boolean chestOverlay = org.zifeng.skilltree.client.SkillKeyBinds.isTreasureInfoVisible();
+        drawRow(gui, 11,
+                t("hud_treasure_overlay") + ": " + (chestOverlay ? t("hud_state_on") : t("hud_state_off")),
+                chestOverlay ? 0xFF55FF55 : 0xFFFF5555,
+                chestOverlay ? 0xFF2A4A2A : 0xFF4A2A2A,
+                chestOverlay ? 0xFF55FF55 : 0xFFFF5555,
+                mouseX, mouseY);
+        // 行13：重置按钮（红色系）
+        drawRow(gui, 12, t("hud_reset"), 0xFFFF5555, 0xFF3A2A2A, 0xFFDD5555, mouseX, mouseY);
         // 步进提示（右下角小字）
         gui.drawString(parent.font(), t("hud_step_hint"), panelX + PAD, panelY + panelH - 10, 0xFF888888, false);
     }
@@ -215,9 +243,46 @@ public class HudAdjustSubScreen extends SkillSubScreen {
                     !org.zifeng.skilltree.client.SkillKeyBinds.isHudShowMaxValue());
             return true;
         }
-        // 行8：重置
+        // 行8：结构剖析面板开关（DimensionTech 联动）
         if (rowHit(mouseX, mouseY, 7, x, w)) {
+            org.zifeng.skilltree.client.SkillKeyBinds.setAnalysisHudVisible(
+                    !org.zifeng.skilltree.client.SkillKeyBinds.isAnalysisHudVisible());
+            return true;
+        }
+        // 行9/行10：结构剖析面板 X/Y
+        if (rowHit(mouseX, mouseY, 8, x, w)) {
+            int dir = arrowZone(mouseX, x, w);
+            if (dir != 0) {
+                org.zifeng.skilltree.client.SkillKeyBinds.adjustAnalysisHudOffsetX(dir * step);
+            }
+            return true;
+        }
+        if (rowHit(mouseX, mouseY, 9, x, w)) {
+            int dir = arrowZone(mouseX, x, w);
+            if (dir != 0) {
+                org.zifeng.skilltree.client.SkillKeyBinds.adjustAnalysisHudOffsetY(dir * step);
+            }
+            return true;
+        }
+        // 行11：期望物品列表条数
+        if (rowHit(mouseX, mouseY, 10, x, w)) {
+            int dir = arrowZone(mouseX, x, w);
+            if (dir != 0) {
+                org.zifeng.skilltree.client.SkillKeyBinds.setAnalysisHudItemLimit(
+                        org.zifeng.skilltree.client.SkillKeyBinds.getAnalysisHudItemLimit() + dir);
+            }
+            return true;
+        }
+        // 行12：宝箱信息浮层开关
+        if (rowHit(mouseX, mouseY, 11, x, w)) {
+            org.zifeng.skilltree.client.SkillKeyBinds.setTreasureInfoVisible(
+                    !org.zifeng.skilltree.client.SkillKeyBinds.isTreasureInfoVisible());
+            return true;
+        }
+        // 行13：重置（技能点 HUD + 结构剖析面板位置归零）
+        if (rowHit(mouseX, mouseY, 12, x, w)) {
             org.zifeng.skilltree.client.SkillPointHudRenderer.resetOffset();
+            org.zifeng.skilltree.client.SkillKeyBinds.setAnalysisHudOffset(0, 0);
             return true;
         }
         return true; // 面板内点击一律拦截
@@ -242,6 +307,21 @@ public class HudAdjustSubScreen extends SkillSubScreen {
         }
         if (rowHit(mouseX, mouseY, 2, x, w)) {
             org.zifeng.skilltree.client.SkillPointHudRenderer.adjustOffsetY(dir * step);
+            return true;
+        }
+        // 结构剖析面板 X/Y（DimensionTech 联动）
+        if (rowHit(mouseX, mouseY, 8, x, w)) {
+            org.zifeng.skilltree.client.SkillKeyBinds.adjustAnalysisHudOffsetX(dir * step);
+            return true;
+        }
+        if (rowHit(mouseX, mouseY, 9, x, w)) {
+            org.zifeng.skilltree.client.SkillKeyBinds.adjustAnalysisHudOffsetY(dir * step);
+            return true;
+        }
+        // 期望物品列表条数
+        if (rowHit(mouseX, mouseY, 10, x, w)) {
+            org.zifeng.skilltree.client.SkillKeyBinds.setAnalysisHudItemLimit(
+                    org.zifeng.skilltree.client.SkillKeyBinds.getAnalysisHudItemLimit() + dir);
             return true;
         }
         return true;

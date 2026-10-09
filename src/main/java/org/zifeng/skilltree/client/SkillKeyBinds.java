@@ -58,6 +58,15 @@ public class SkillKeyBinds {
     private static Boolean panelUseVanillaAttr = null;
     /** 子界面位置（2026-09-01：子界面标识 → [x, y] 面板左上角，持久化拖动结果） */
     private static final Map<String, int[]> SUB_SCREEN_POS = new HashMap<>();
+    /** 结构剖析面板位置偏移（DimensionTech 联动；基准点 = 屏幕左上角，默认 0,0）。 */
+    private static int analysisHudOffsetX = 0;
+    private static int analysisHudOffsetY = 0;
+    /** 结构剖析面板显示开关（默认<b>关</b>：面板会常驻，先由玩家在 HUD 调整里开）。 */
+    private static boolean analysisHudVisible = false;
+    /** 结构剖析面板期望物品列表的显示条数上限（默认 8）。 */
+    private static int analysisHudItemLimit = 8;
+    /** 寻宝大师·宝箱信息浮层显示开关（默认开）。 */
+    private static boolean treasureInfoVisible = true;
     /**
      * 技能树界面尺寸【相对基准的偏移量】（★ 2026-09-21 新增，设置子界面可调）。
      *
@@ -463,6 +472,69 @@ public class SkillKeyBinds {
         save();
     }
 
+    // ============ 结构剖析面板 / 宝箱浮层（DimensionTech 联动） ============
+
+    public static int getAnalysisHudOffsetX() {
+        load();
+        return analysisHudOffsetX;
+    }
+
+    public static int getAnalysisHudOffsetY() {
+        load();
+        return analysisHudOffsetY;
+    }
+
+    public static void setAnalysisHudOffset(int x, int y) {
+        analysisHudOffsetX = clamp(-800, 800, x);
+        analysisHudOffsetY = clamp(-400, 400, y);
+        save();
+    }
+
+    public static void adjustAnalysisHudOffsetX(int delta) {
+        setAnalysisHudOffset(analysisHudOffsetX + delta, analysisHudOffsetY);
+    }
+
+    public static void adjustAnalysisHudOffsetY(int delta) {
+        setAnalysisHudOffset(analysisHudOffsetX, analysisHudOffsetY + delta);
+    }
+
+    /** 结构剖析面板是否显示（默认关）。 */
+    public static boolean isAnalysisHudVisible() {
+        load();
+        return analysisHudVisible;
+    }
+
+    public static void setAnalysisHudVisible(boolean on) {
+        analysisHudVisible = on;
+        save();
+    }
+
+    /** 期望物品列表显示条数上限（1~20）。 */
+    public static int getAnalysisHudItemLimit() {
+        load();
+        return analysisHudItemLimit;
+    }
+
+    public static void setAnalysisHudItemLimit(int limit) {
+        analysisHudItemLimit = clamp(1, 20, limit);
+        save();
+    }
+
+    /** 寻宝大师·宝箱信息浮层是否显示（默认开）。 */
+    public static boolean isTreasureInfoVisible() {
+        load();
+        return treasureInfoVisible;
+    }
+
+    public static void setTreasureInfoVisible(boolean on) {
+        treasureInfoVisible = on;
+        save();
+    }
+
+    private static int clamp(int min, int max, int value) {
+        return Math.max(min, Math.min(max, value));
+    }
+
     // ============ 文件读写 ============
 
     private static File file() {
@@ -550,6 +622,15 @@ public class SkillKeyBinds {
                     }
                 }
             }
+            // DimensionTech 联动（结构剖析面板 / 宝箱浮层）——旧配置无这些字段 → 用默认值
+            analysisHudOffsetX = data.analysisHudOffsetX != null
+                    ? clamp(-800, 800, data.analysisHudOffsetX) : 0;
+            analysisHudOffsetY = data.analysisHudOffsetY != null
+                    ? clamp(-400, 400, data.analysisHudOffsetY) : 0;
+            analysisHudVisible = data.analysisHudVisible != null && data.analysisHudVisible;
+            analysisHudItemLimit = data.analysisHudItemLimit != null
+                    ? clamp(1, 20, data.analysisHudItemLimit) : 8;
+            treasureInfoVisible = data.treasureInfoVisible == null || data.treasureInfoVisible;
         } catch (Exception ignored) {
             // 读取失败（文件损坏等）→ 用默认值，不崩溃
         }
@@ -594,6 +675,11 @@ public class SkillKeyBinds {
             for (Map.Entry<String, int[]> e : SUB_SCREEN_POS.entrySet()) {
                 data.subScreenPos.put(e.getKey(), new int[]{e.getValue()[0], e.getValue()[1]});
             }
+            data.analysisHudOffsetX = analysisHudOffsetX;
+            data.analysisHudOffsetY = analysisHudOffsetY;
+            data.analysisHudVisible = analysisHudVisible;
+            data.analysisHudItemLimit = analysisHudItemLimit;
+            data.treasureInfoVisible = treasureInfoVisible;
             String json = new GsonBuilder().setPrettyPrinting().create().toJson(data);
             Files.writeString(f.toPath(), json, StandardCharsets.UTF_8);
         } catch (IOException ignored) {
@@ -623,5 +709,11 @@ public class SkillKeyBinds {
         Integer skillTreeGuiOffset;  // 技能树界面尺寸偏移量（★ 2026-09-21；0=基准，null=旧配置→0）
         Boolean skillTreeGuiAdaptive; // 技能树界面缩放模式（null=旧配置→自适应）
         Map<String, int[]> subScreenPos; // 子界面位置（2026-09-01）
+        // DimensionTech 联动（寻宝大师扩展 / 结构剖析）—— 全为可空以兼容旧配置
+        Integer analysisHudOffsetX;
+        Integer analysisHudOffsetY;
+        Boolean analysisHudVisible;
+        Integer analysisHudItemLimit;
+        Boolean treasureInfoVisible;
     }
 }

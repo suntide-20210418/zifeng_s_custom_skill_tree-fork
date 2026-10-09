@@ -58,6 +58,21 @@ public class ClientTreasureEvents {
         return dx * dx + dz * dz <= SCAN_RADIUS_SQ && dy * dy <= SCAN_Y_RADIUS_SQ;
     }
 
+    /**
+     * 最近一次扫描缓存的金色容器位置（只读）。
+     *
+     * <p>DimensionTech 联动（宝箱信息浮层 / 手持宝箱标记器左键标记）用它判断"准星是否落在寻宝大师
+     * 标记的那个箱子上"，与渲染用的同一份数据，保证所见即所击。
+     */
+    public static List<BlockPos> cachedTreasures() {
+        return CACHED_TREASURES;
+    }
+
+    /** 该位置是否是当前缓存中的金色容器。 */
+    public static boolean isCachedTreasure(BlockPos pos) {
+        return pos != null && CACHED_TREASURES.contains(pos);
+    }
+
     /** 每秒扫描一次 64 格内的战利品容器/考古刷扫点 */
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Pre event) {

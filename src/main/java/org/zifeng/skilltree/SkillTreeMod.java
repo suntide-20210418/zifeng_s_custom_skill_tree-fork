@@ -129,6 +129,8 @@ public class SkillTreeMod {
         NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent event) -> {
             org.zifeng.skilltree.system.ZModules.onServerStop();
             org.zifeng.skilltree.system.TickClock.reset(); // tick 时钟一并清空（防跨存档残留旧时间戳）
+            // DimensionTech 联动估值缓存清理（防跨存档残留）
+            org.zifeng.skilltree.server.SkillLinkServer.onServerStopped();
         });
 
         if (FMLLoader.getDist().isClient()) {

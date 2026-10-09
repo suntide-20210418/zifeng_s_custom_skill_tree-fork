@@ -38,6 +38,12 @@ public class ModNetwork {
         // 磁铁屏蔽区（2026-09-07）：C2S 加/删区，S2C 回发当前区列表
         registrar.playToServer(MagnetExclusionC2SPacket.TYPE, MagnetExclusionC2SPacket.STREAM_CODEC, MagnetExclusionC2SPacket::handle);
         registrar.playToClient(MagnetExclusionS2CPacket.TYPE, MagnetExclusionS2CPacket.STREAM_CODEC, MagnetExclusionS2CPacket::handle);
+        // DimensionTech 联动（寻宝大师扩展 + 结构剖析）
+        registrar.playToServer(SkillChestValuationC2SPacket.TYPE, SkillChestValuationC2SPacket.STREAM_CODEC, SkillChestValuationC2SPacket::handle);
+        registrar.playToClient(SkillChestValuationS2CPacket.TYPE, SkillChestValuationS2CPacket.STREAM_CODEC, SkillChestValuationS2CPacket::handle);
+        registrar.playToServer(SkillStructureScanC2SPacket.TYPE, SkillStructureScanC2SPacket.STREAM_CODEC, SkillStructureScanC2SPacket::handle);
+        registrar.playToClient(SkillStructureRegionsS2CPacket.TYPE, SkillStructureRegionsS2CPacket.STREAM_CODEC, SkillStructureRegionsS2CPacket::handle);
+        registrar.playToServer(SkillMarkChestC2SPacket.TYPE, SkillMarkChestC2SPacket.STREAM_CODEC, SkillMarkChestC2SPacket::handle);
     }
 
     /** 服务端 → 指定玩家 */

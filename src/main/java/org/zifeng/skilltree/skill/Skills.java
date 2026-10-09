@@ -197,6 +197,7 @@ public final class Skills {
             case UNLIMITED_TRADES -> 100L;   // 无限交易：一次性 100 点
             case VILLAGER_MASTER -> 1000L;   // 村民大师：一次性 1000 点
             case TREASURE_HUNTER -> 500L;    // 寻宝大师：一次性 500 点
+            case STRUCTURE_ANALYSIS -> 1000L; // 结构剖析：一次性 1000 点（DimensionTech 联动）
             case GLUTTONY -> 5L;             // 暴食：一次性 5 点（2026-09-06）
             case BLINK -> 10L;               // 闪现：一次性 10 点（2026-09-06）
             // 奥术防护（2026-09-14）：进阶机制各 1000 点；奥术神体走 Config
@@ -279,6 +280,7 @@ public final class Skills {
     public static final String UNLIMITED_TRADES = "unlimited_trades"; // 无限交易（100点，村民不用补货，交易次数不减少）
     public static final String VILLAGER_MASTER = "villager_master";   // 村民大师（1000点，交易后村民直接满级）
     public static final String TREASURE_HUNTER = "treasure_hunter";   // 寻宝大师（500点，64格内战利品容器/考古刷扫点发光）
+    public static final String STRUCTURE_ANALYSIS = "structure_analysis"; // 结构剖析（1000点，半径16区块内显示已生成结构区域与产出期望；需 DimensionTech 提供数值）
     public static final String GLUTTONY = "gluttony";                 // 暴食（秒吃所有食物，1级，5点，2026-09-06）
     public static final String BLINK = "blink";                       // 闪现（向视线方向传送，1级，10点，2026-09-06）
 
@@ -501,6 +503,7 @@ public final class Skills {
             VILLAGE_HERO, REACH, GLOW,
             ENCHANT_RANDOM, ENCHANT_BREAK, ENCHANT_OVER,
             UNLIMITED_TRADES, VILLAGER_MASTER, TREASURE_HUNTER,
+            STRUCTURE_ANALYSIS, // 结构剖析（DimensionTech 联动，2026-10-09）
             GLUTTONY, BLINK,
             // 奥术防护（2026-09-14）：一次性奇技
             ARCANE_ADAPT, SPELL_REFLECT, SPELL_PURGE, MANA_SIPHON, SPELLBREAK_BLADE);
@@ -1265,6 +1268,7 @@ public final class Skills {
             case UNLIMITED_TRADES -> "skill.zifeng_s_custom_skill_tree." + skillId + ".name";
             case VILLAGER_MASTER -> "skill.zifeng_s_custom_skill_tree." + skillId + ".name";
             case TREASURE_HUNTER -> "skill.zifeng_s_custom_skill_tree." + skillId + ".name";
+            case STRUCTURE_ANALYSIS -> "skill.zifeng_s_custom_skill_tree." + skillId + ".name";
             case GLUTTONY -> "skill.zifeng_s_custom_skill_tree." + skillId + ".name";
             case BLINK -> "skill.zifeng_s_custom_skill_tree." + skillId + ".name";
             case MACHINE_ZONE_PLACE, MACHINE_ZONE_EXCAVATE, MACHINE_ZONE_ATTACK, MACHINE_ZONE_PROTECT -> "skill.zifeng_s_custom_skill_tree." + skillId + ".name"; // 木棍工具区块技能（2026-09-08）
@@ -1398,6 +1402,7 @@ public final class Skills {
             case UNLIMITED_TRADES -> "skill.zifeng_s_custom_skill_tree." + skillId + ".desc";
             case VILLAGER_MASTER -> "skill.zifeng_s_custom_skill_tree." + skillId + ".desc";
             case TREASURE_HUNTER -> "skill.zifeng_s_custom_skill_tree." + skillId + ".desc";
+            case STRUCTURE_ANALYSIS -> "skill.zifeng_s_custom_skill_tree." + skillId + ".desc";
             case GLUTTONY -> "skill.zifeng_s_custom_skill_tree." + skillId + ".desc";
             case BLINK -> "skill.zifeng_s_custom_skill_tree." + skillId + ".desc";
             case MACHINE_ZONE_PLACE, MACHINE_ZONE_EXCAVATE, MACHINE_ZONE_ATTACK, MACHINE_ZONE_PROTECT -> "skill.zifeng_s_custom_skill_tree." + skillId + ".desc"; // 木棍工具区块技能（2026-09-08）
@@ -1686,6 +1691,7 @@ public final class Skills {
             case UNLIMITED_TRADES -> Items.EMERALD;           // 无限交易：绿宝石（交易货币）
             case VILLAGER_MASTER -> Items.EMERALD_BLOCK;      // 村民大师：绿宝石块（满级大师）
             case TREASURE_HUNTER -> Items.GOLD_NUGGET;        // 寻宝大师：金粒（宝箱宝藏）
+            case STRUCTURE_ANALYSIS -> Items.SPYGLASS;        // 结构剖析：望远镜（观察结构）
             case GLUTTONY -> Items.COOKED_BEEF;               // 暴食：牛排（大快朵颐秒吃）
             case BLINK -> Items.ENDER_PEARL;                  // 闪现：末影珍珠（瞬移）
             case MACHINE_ZONE_PLACE -> Items.BRICK;           // 选区放置：砖（摆放）
