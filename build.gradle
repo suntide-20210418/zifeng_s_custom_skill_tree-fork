@@ -102,7 +102,18 @@ dependencies {
     compileOnly "maven.modrinth:jade:15.10.6+neoforge"
     // DimensionTech（可选联动的数据来源：结构/宝箱战利品期望、结构价值、维度价值）。
     // compileOnly → 只借它的 API 签名编译；运行时若未安装，compat 隔离层不会被触达（见 DimensionTechBridge 门闩）。
-    // 本地开发前置：先在 DimensionTech 工程执行 ./gradlew publishToMavenLocal（坐标见 dimension_tech_version）。
+    //
+    // 当前用 mavenLocal 坐标（2026-10-09 决定，见 dimension_tech_version）。
+    //   · 前置：先在 DimensionTech 工程执行 ./gradlew publishToMavenLocal。
+    //   · 之所以还不能改用 CurseForge：DT 在 CF 上最新的一版是 dimensiontech-1711022 的 file 9026891
+    //     （dimension_tech-1.0.3-1.21.1.jar，2026-10-01 上传），它**早于 api/ 包被加入**，jar 里
+    //     com.suntide_20210418.dimensiontech.api 下 0 个类，拿它编译必然找不到符号。
+    //   · 切换时机与步骤：等 DT 再发一版（该版必须含 api/）后，把上面这行换成
+    //         compileOnly "curse.maven:dimensiontech-1711022:<新 fileId>"
+    //     并在仓库列表里加 cursemaven.com（参考 DimensionTech/build.gradle 的 exclusiveContent 写法）。
+    //     fileId 可从上游 release 摘要的 CurseForge 链接（.../files/<id>）或 https://api.cfwidget.com/1711022 取得。
+    //   · ⚠️ CurseMaven **不提供 maven-metadata.xml**，无法解析版本区间 → 只能钉死 fileId，
+    //     DT 每发一版都要同步改这个数字（好处：api 签名破坏时会在编译期就报错，而不是静默选到新版本）。
     compileOnly "com.suntide_20210418.dimensiontech:DimensionTech-1.21.1:${dimension_tech_version}"
 }
 
